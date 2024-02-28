@@ -47,7 +47,7 @@ RSpec.describe WattiWatchman::Meter::Victron do
     it "handles initial keepalive" do
       subject.do
       expect(mqtt_cache_to_server).to_not be_empty
-      expect(mqtt_cache_to_server.pop).to match({topic: "R/#{vrm_id}/keepalive", message: anything})
+      expect(mqtt_cache_to_server.pop).to match({topic: "R/#{vrm_id}/keepalive",message: anything})
     end
 
     it "handles initial subscribe" do
@@ -65,8 +65,8 @@ RSpec.describe WattiWatchman::Meter::Victron do
     it "registers common message_*" do
       veregister("Dc/0/Power", 12)
       subject.do
-      expect(mcache).to include(%Q(victron_messages_consumed_total{name="#{name}", id="#{vrm_id}"}))
-      expect(mcache).to include(%Q(victron_messages_processed_total{name="#{name}", id="#{vrm_id}"}))
+      expect(mcache).to include(%Q(victron_messages_consumed_total{name="#{name}",id="#{vrm_id}"}))
+      expect(mcache).to include(%Q(victron_messages_processed_total{name="#{name}",id="#{vrm_id}"}))
       expect(mcache.keys.to_s).not_to include("victron_messages_payload_invalid_total")
       expect(mcache.keys.to_s).not_to include("victron_messages_value_null_total")
     end
@@ -75,11 +75,11 @@ RSpec.describe WattiWatchman::Meter::Victron do
       veregister("Dc/0/Power", nil)
       veregister("Ac/ActiveIn/L1/P", nil)
       subject.do
-      expect(mcache).to include(%Q(victron_messages_consumed_total{name="#{name}", id="#{vrm_id}"}))
+      expect(mcache).to include(%Q(victron_messages_consumed_total{name="#{name}",id="#{vrm_id}"}))
       expect(mcache).to include(
-        %Q(victron_messages_value_null_total{name="#{name}", id="#{vrm_id}", definition="victron_dc_power"}))
+        %Q(victron_messages_value_null_total{name="#{name}",id="#{vrm_id}",definition="victron_dc_power"}))
       expect(mcache).to include(
-        %Q(victron_messages_value_null_total{name="#{name}", id="#{vrm_id}", definition="victron_ac_in_power_l1"}))
+        %Q(victron_messages_value_null_total{name="#{name}",id="#{vrm_id}",definition="victron_ac_in_power_l1"}))
       expect(mcache.keys.to_s).not_to include("victron_messages_processed_total")
     end
   end

@@ -111,7 +111,7 @@ RSpec.describe WattiWatchman::Meter::Janitza do
     iterations(1)
     expect(modbus_slave_object).to receive(:query).and_return(nil)
     subject.do() 
-    metric = mcache[%Q(janitza_processing_errors_count_total{name="#{name}", error="register_query_error"})]
+    metric = mcache[%Q(janitza_processing_errors_count_total{name="#{name}",error="register_query_error"})]
     expect(metric["metric"]&.value).to eq(1.0)
     expect{subject.total_power}.to raise_error(WattiWatchman::Meter::PowerMetricNotFoundError) 
 
@@ -126,7 +126,7 @@ RSpec.describe WattiWatchman::Meter::Janitza do
       .and_return((registers[0..3] + registers).pack("g*"))
     subject.do() 
     puts unit_logger.string
-    metric = mcache[%Q(janitza_processing_errors_count_total{name="#{name}", error="register_overrun"})]
+    metric = mcache[%Q(janitza_processing_errors_count_total{name="#{name}",error="register_overrun"})]
     expect(metric["metric"]&.value).to eq(1.0)
     expect{subject.total_power}.to raise_error(WattiWatchman::Meter::PowerMetricNotFoundError) 
 
@@ -144,7 +144,7 @@ RSpec.describe WattiWatchman::Meter::Janitza do
       iterations(1)
       expect(modbus_slave_object).to receive(:query).and_raise(error_class)
       subject.do() 
-      metric = mcache[%Q(janitza_processing_errors_count_total{name="#{name}", error="#{error_string}"})]
+      metric = mcache[%Q(janitza_processing_errors_count_total{name="#{name}",error="#{error_string}"})]
       expect(metric["metric"]&.value).to eq(1.0)
       expect{subject.total_power}.to raise_error(WattiWatchman::Meter::PowerMetricNotFoundError) 
 
@@ -158,7 +158,7 @@ RSpec.describe WattiWatchman::Meter::Janitza do
     start_time = Time.now
     iterations(1)
     subject.do() 
-    register_count_metric = mcache[%Q(janitza_voltage{name="#{name}", phase="l1"})]
+    register_count_metric = mcache[%Q(janitza_voltage{name="#{name}",phase="l1"})]
     expect(register_count_metric).not_to be_nil
     expect(register_count_metric["metric"]).to be_a WattiWatchman::Meter::Metric
     expect(register_count_metric["metric"].value).to eq(registers.first)
@@ -218,7 +218,7 @@ RSpec.describe WattiWatchman::Meter::Janitza do
     end
 
     it "ignored non power metric" do
-      metric_name = %Q(janitza_voltage{name="#{name}", phase="l1"})
+      metric_name = %Q(janitza_voltage{name="#{name}",phase="l1"})
       voltage_metric = mcache[metric_name]
       expect(voltage_metric).not_to be_nil
       expect(subject.power_metric_classifier(metric_name)).to be_nil
@@ -226,7 +226,7 @@ RSpec.describe WattiWatchman::Meter::Janitza do
     end
 
     it "returns phase from phase based power tracking metric" do
-      metric_name = %Q(janitza_real_power{name="#{name}", phase="l2"})
+      metric_name = %Q(janitza_real_power{name="#{name}",phase="l2"})
       power_metric = mcache[metric_name]
       expect(power_metric).not_to be_nil
       expect(subject.power_metric_classifier(metric_name)).to eq("l2")

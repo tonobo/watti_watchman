@@ -157,7 +157,7 @@ module WattiWatchman
 
         "%s{%s}" % [
           name,
-          _labels.map{ |key, value| %Q(#{key}="#{value}") }.join(", ")
+          _labels.map{ |key, value| %Q(#{key}="#{value}") }.join(",")
         ] 
       end
 
