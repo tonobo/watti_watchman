@@ -1,0 +1,15 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: http://watti.klaut.io/schemas/main_schema.yml
+title: WattiWatchman Main Config
+type: object
+required:
+  - mqtt_connections
+  - meters
+properties:
+  mqtt_connections:
+    $ref: http://watti.klaut.io/schemas/mqtt_connections_schema.yml
+  meters:
+    $ref: http://watti.klaut.io/schemas/meters_schema.yml
+  services:
+    $ref: http://watti.klaut.io/schemas/services_schema.yml
+additionalProperties: false
