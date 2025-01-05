@@ -1,0 +1,42 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: http://watti.klaut.local/schemas/charge_controller_service_schema.yml
+title: Charge Controller Service
+type: object
+properties:
+  type:
+    type: string
+    const: ChargeController
+  grid_meter_name:
+    type: string
+    description: Name of the grid meter (e.g. Janitza or Victron) used by the charge controller to measure entire usage.
+  battery_meter_name:
+    type: string
+    description: Name of the battery meter (e.g. Janitza or Victron) that measures battery state.
+  battery_controller_name:
+    type: string
+    description: Name of the Victron or other meter (implemtation) that can control the battery (charge/discharge).
+  target_setpoint:
+    type: number
+    description: Defines the target power level (in W) at the main grid connection. The controller attempts to regulate actual power flow towards this value.
+    default: 0
+    x_dynamic_config: true
+  charge_limits:
+    type: object
+    patternProperties:
+      ^[0-9]+$:
+        type: integer
+    description: 'Mapping: StateOfCharge -> max charge power (W) at that SoC'
+    default: {}
+  discharge_limits:
+    type: object
+    patternProperties:
+      ^[0-9]+$:
+        type: integer
+    description: 'Mapping: StateOfCharge -> max discharge power (W) at that SoC'
+    default: {}
+required:
+  - type
+  - grid_meter_name
+  - battery_meter_name
+  - battery_controller_name
+additionalProperties: false

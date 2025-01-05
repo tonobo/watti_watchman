@@ -1,0 +1,21 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: http://watti.klaut.local/schemas/mqtt_connections_schema.yml
+title: MQTT Connections
+type: array
+items:
+  type: object
+  required:
+    - name
+    - host
+    - port
+  properties:
+    name:
+      type: string
+      description: Arbitrary name for this MQTT connection. Must be unique.
+    host:
+      type: string
+      description: MQTT broker hostname or IP.
+    port:
+      type: integer
+      description: MQTT broker port number.
+  additionalProperties: false

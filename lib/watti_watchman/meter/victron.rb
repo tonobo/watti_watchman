@@ -2,8 +2,21 @@ module WattiWatchman
   class Meter
     class Victron
       include MeterClassifier
-      include Logger
+      include WattiWatchman::Logger
       include BatteryController
+      extend WattiWatchman::Config::Hooks
+
+      meter_config "Victron" do |config, item|
+        conn = config.lookup_mqtt_connection(item["mqtt_connection_name"])
+
+        meter = WattiWatchman::Meter::Victron.new(
+          name: item["name"],
+          mqtt_params: conn,
+          id: item["id"]
+        )
+        meter.spawn
+        WattiWatchman::Meter.connections[item['name']] = meter
+      end
 
       # Register order is mandatory as it's being used to efficently fetch all metrics once via modbus
       Registers = [

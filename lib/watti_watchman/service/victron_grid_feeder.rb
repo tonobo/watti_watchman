@@ -2,6 +2,27 @@ module WattiWatchman
   module Service
     class VictronGridFeeder
       include WattiWatchman::Logger
+      extend WattiWatchman::Config::Hooks
+
+      service_config "VictronGridFeeder" do |config, item|
+        conn = config.lookup_mqtt_connection(item["mqtt_connection_name"])
+        meter_obj = config.lookup_meter(item["grid_meter_name"])
+
+        write_prefix = item["write_prefix"]
+        unless item["write_prefix"]
+          grid_provider = WattiWatchman::Service::VictronGridProvider.new(
+            mqtt_params: conn,
+          )
+          write_prefix = grid_provider.write_prefix
+        end
+
+        feeder = WattiWatchman::Service::VictronGridFeeder.new(
+          mqtt_params: conn,
+          grid_meter: meter_obj,
+          write_prefix: write_prefix,
+        )
+        WattiWatchman::Meter.register("victron-grid-feeder", feeder)
+      end
 
       attr_reader :grid_meter, :write_prefix, :options
 

@@ -35,6 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "concurrent-ruby"
   spec.add_dependency "oj"
   spec.add_dependency "async"
+  spec.add_dependency "json_schemer"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

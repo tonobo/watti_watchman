@@ -1,6 +1,28 @@
 module WattiWatchman
   module Service
     class ChargeController
+      extend WattiWatchman::Config::Hooks
+
+      service_config "ChargeController" do |config, item|
+        grid_meter_obj      = config.lookup_meter(item["grid_meter_name"])
+        battery_meter_obj   = config.lookup_meter(item["battery_meter_name"])
+        battery_ctrl_obj    = config.lookup_meter(item["battery_controller_name"])
+
+        cc_options = {
+          charge_limits:    (item["charge_limits"]    || {}).transform_keys!(&:to_i),
+          discharge_limits: (item["discharge_limits"] || {}).transform_keys!(&:to_i)
+        }
+
+        charge_controller = WattiWatchman::Service::ChargeController.new(
+          grid_meter:         grid_meter_obj,
+          battery_meter:      battery_meter_obj,
+          battery_controller: battery_ctrl_obj,
+          options:            cc_options
+        )
+
+        WattiWatchman::Meter.register("charge-controller", charge_controller)
+      end
+
       attr_reader :grid_meter, :battery_meter, :battery_controller, :options
 
       UPDATE_FREQUENCY = 0.2

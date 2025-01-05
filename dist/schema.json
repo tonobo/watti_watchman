@@ -1,0 +1,321 @@
+{
+  "$schema":"http://json-schema.org/draft-07/schema#",
+  "$id":"http://watti.klaut.local/schemas/main_schema.yml",
+  "title":"WattiWatchman Main Config",
+  "type":"object",
+  "properties":{
+    "mqtt_connections":{
+      "$ref":"http://watti.klaut.local/schemas/mqtt_connections_schema.yml"
+    },
+    "meters":{
+      "$ref":"http://watti.klaut.local/schemas/meters_schema.yml"
+    },
+    "services":{
+      "$ref":"http://watti.klaut.local/schemas/services_schema.yml"
+    }
+  },
+  "additionalProperties":false,
+  "definitions":{
+    "http://watti.klaut.local/schemas/mqtt_connections_schema.yml":{
+      "$schema":"http://json-schema.org/draft-07/schema#",
+      "$id":"http://watti.klaut.local/schemas/mqtt_connections_schema.yml",
+      "title":"MQTT Connections",
+      "type":"array",
+      "items":{
+        "type":"object",
+        "required":[
+          "name",
+          "host",
+          "port"
+        ],
+        "properties":{
+          "name":{
+            "type":"string",
+            "description":"Arbitrary name for this MQTT connection. Must be unique."
+          },
+          "host":{
+            "type":"string",
+            "description":"MQTT broker hostname or IP."
+          },
+          "port":{
+            "type":"integer",
+            "description":"MQTT broker port number."
+          }
+        },
+        "additionalProperties":false
+      }
+    },
+    "http://watti.klaut.local/schemas/meters_schema.yml":{
+      "$schema":"http://json-schema.org/draft-07/schema#",
+      "$id":"http://watti.klaut.local/schemas/meters_schema.yml",
+      "title":"Meters Array",
+      "type":"array",
+      "items":{
+        "type":"object",
+        "properties":{
+          "type":{
+            "type":"string",
+            "description":"The type of the meter."
+          }
+        },
+        "required":[
+          "type"
+        ],
+        "if":{
+          "properties":{
+            "type":{
+              "const":"Janitza"
+            }
+          }
+        },
+        "then":{
+          "$ref":"http://watti.klaut.local/schemas/janitza_meter_schema.yml"
+        },
+        "else":{
+          "if":{
+            "properties":{
+              "type":{
+                "const":"Victron"
+              }
+            }
+          },
+          "then":{
+            "$ref":"http://watti.klaut.local/schemas/victron_meter_schema.yml"
+          },
+          "else":{
+            "errorMessage":"Unsupported meter type."
+          }
+        }
+      }
+    },
+    "http://watti.klaut.local/schemas/services_schema.yml":{
+      "$schema":"http://json-schema.org/draft-07/schema#",
+      "$id":"http://watti.klaut.local/schemas/services_schema.yml",
+      "title":"Services Array",
+      "type":"array",
+      "items":{
+        "type":"object",
+        "properties":{
+          "type":{
+            "type":"string",
+            "description":"The type of service to configure."
+          }
+        },
+        "required":[
+          "type"
+        ],
+        "if":{
+          "properties":{
+            "type":{
+              "const":"HassFeeder"
+            }
+          }
+        },
+        "then":{
+          "$ref":"http://watti.klaut.local/schemas/hass_feeder_service_schema.yml"
+        },
+        "else":{
+          "if":{
+            "properties":{
+              "type":{
+                "const":"VictronGridFeeder"
+              }
+            }
+          },
+          "then":{
+            "$ref":"http://watti.klaut.local/schemas/victron_grid_feeder_service_schema.yml"
+          },
+          "else":{
+            "if":{
+              "properties":{
+                "type":{
+                  "const":"ChargeController"
+                }
+              }
+            },
+            "then":{
+              "$ref":"http://watti.klaut.local/schemas/charge_controller_service_schema.yml"
+            },
+            "else":{
+              "errorMessage":"Unsupported service type."
+            }
+          }
+        }
+      }
+    },
+    "http://watti.klaut.local/schemas/janitza_meter_schema.yml":{
+      "$schema":"http://json-schema.org/draft-07/schema#",
+      "$id":"http://watti.klaut.local/schemas/janitza_meter_schema.yml",
+      "title":"Janitza Meter",
+      "type":"object",
+      "properties":{
+        "type":{
+          "type":"string",
+          "const":"Janitza"
+        },
+        "name":{
+          "type":"string"
+        },
+        "host":{
+          "type":"string"
+        },
+        "port":{
+          "type":"integer"
+        },
+        "unit":{
+          "type":"integer"
+        }
+      },
+      "required":[
+        "type",
+        "name",
+        "host",
+        "port",
+        "unit"
+      ],
+      "additionalProperties":false
+    },
+    "http://watti.klaut.local/schemas/hass_feeder_service_schema.yml":{
+      "$schema":"http://json-schema.org/draft-07/schema#",
+      "$id":"http://watti.klaut.local/schemas/hass_feeder_service_schema.yml",
+      "title":"Hass Feeder",
+      "type":"object",
+      "required":[
+        "mqtt_connection_name"
+      ],
+      "properties":{
+        "type":{
+          "type":"string",
+          "const":"HassFeeder"
+        },
+        "mqtt_connection_name":{
+          "type":"string",
+          "description":"Name of an existing MQTT connection from mqtt_connections array."
+        },
+        "update_interval":{
+          "type":"number",
+          "description":"Publish interval in seconds",
+          "default":5
+        }
+      },
+      "additionalProperties":false
+    },
+    "http://watti.klaut.local/schemas/victron_meter_schema.yml":{
+      "$schema":"http://json-schema.org/draft-07/schema#",
+      "$id":"http://watti.klaut.local/schemas/victron_meter_schema.yml",
+      "title":"Victron Meter",
+      "type":"object",
+      "properties":{
+        "type":{
+          "type":"string",
+          "const":"Victron"
+        },
+        "name":{
+          "type":"string"
+        },
+        "mqtt_connection_name":{
+          "type":"string",
+          "description":"Which of the mqtt_connections to use"
+        },
+        "id":{
+          "type":"string",
+          "description":"e.g. VRM ID"
+        }
+      },
+      "required":[
+        "type",
+        "name",
+        "mqtt_connection_name",
+        "id"
+      ],
+      "additionalProperties":false
+    },
+    "http://watti.klaut.local/schemas/victron_grid_feeder_service_schema.yml":{
+      "$schema":"http://json-schema.org/draft-07/schema#",
+      "$id":"http://watti.klaut.local/schemas/victron_grid_feeder_service_schema.yml",
+      "title":"Victron Grid Feeder Service",
+      "type":"object",
+      "properties":{
+        "type":{
+          "type":"string",
+          "const":"VictronGridFeeder"
+        },
+        "mqtt_connection_name":{
+          "type":"string",
+          "description":"Which MQTT connection to use"
+        },
+        "grid_meter_name":{
+          "type":"string",
+          "description":"Which meter is used as grid meter"
+        },
+        "write_prefix":{
+          "type":"string",
+          "description":"Prefix to write data to (e.g. 'N/...'). Autoconfig will with Victron Grid Provider Service if not provided"
+        }
+      },
+      "required":[
+        "type",
+        "mqtt_connection_name",
+        "grid_meter_name"
+      ],
+      "additionalProperties":false
+    },
+    "http://watti.klaut.local/schemas/charge_controller_service_schema.yml":{
+      "$schema":"http://json-schema.org/draft-07/schema#",
+      "$id":"http://watti.klaut.local/schemas/charge_controller_service_schema.yml",
+      "title":"Charge Controller Service",
+      "type":"object",
+      "properties":{
+        "type":{
+          "type":"string",
+          "const":"ChargeController"
+        },
+        "grid_meter_name":{
+          "type":"string",
+          "description":"Name of the grid meter (e.g. Janitza or Victron) used by the charge controller to measure entire usage."
+        },
+        "battery_meter_name":{
+          "type":"string",
+          "description":"Name of the battery meter (e.g. Janitza or Victron) that measures battery state."
+        },
+        "battery_controller_name":{
+          "type":"string",
+          "description":"Name of the Victron or other meter (implemtation) that can control the battery (charge/discharge)."
+        },
+        "target_setpoint":{
+          "type":"number",
+          "description":"Defines the target power level (in W) at the main grid connection. The controller attempts to regulate actual power flow towards this value.",
+          "default":0,
+          "x_dynamic_config":true
+        },
+        "charge_limits":{
+          "type":"object",
+          "patternProperties":{
+            "^[0-9]+$":{
+              "type":"integer"
+            }
+          },
+          "description":"Mapping: StateOfCharge -> max charge power (W) at that SoC",
+          "default":{}
+        },
+        "discharge_limits":{
+          "type":"object",
+          "patternProperties":{
+            "^[0-9]+$":{
+              "type":"integer"
+            }
+          },
+          "description":"Mapping: StateOfCharge -> max discharge power (W) at that SoC",
+          "default":{}
+        }
+      },
+      "required":[
+        "type",
+        "grid_meter_name",
+        "battery_meter_name",
+        "battery_controller_name"
+      ],
+      "additionalProperties":false
+    }
+  }
+}

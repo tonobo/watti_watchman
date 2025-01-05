@@ -1,0 +1,34 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: http://watti.klaut.local/schemas/services_schema.yml
+title: Services Array
+type: array
+items:
+  type: object
+  properties:
+    type:
+      type: string
+      description: The type of service to configure.
+  required:
+    - type
+  if:
+    properties:
+      type:
+        const: HassFeeder
+  then:
+    $ref: http://watti.klaut.local/schemas/hass_feeder_service_schema.yml
+  else:
+    if:
+      properties:
+        type:
+          const: VictronGridFeeder
+    then:
+      $ref: http://watti.klaut.local/schemas/victron_grid_feeder_service_schema.yml
+    else:
+      if:
+        properties:
+          type:
+            const: ChargeController
+      then:
+        $ref: http://watti.klaut.local/schemas/charge_controller_service_schema.yml
+      else:
+        errorMessage: Unsupported service type.

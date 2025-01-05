@@ -1,0 +1,27 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: http://watti.klaut.local/schemas/meters_schema.yml
+title: Meters Array
+type: array
+items:
+  type: object
+  properties:
+    type:
+      type: string
+      description: The type of the meter.
+  required:
+    - type
+  if:
+    properties:
+      type:
+        const: Janitza
+  then:
+    $ref: http://watti.klaut.local/schemas/janitza_meter_schema.yml
+  else:
+    if:
+      properties:
+        type:
+          const: Victron
+    then:
+      $ref: http://watti.klaut.local/schemas/victron_meter_schema.yml
+    else:
+      errorMessage: Unsupported meter type.
