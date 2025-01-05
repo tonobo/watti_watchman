@@ -137,7 +137,19 @@
               "$ref":"http://watti.klaut.local/schemas/charge_controller_service_schema.yml"
             },
             "else":{
-              "errorMessage":"Unsupported service type."
+              "if":{
+                "properties":{
+                  "type":{
+                    "const":"HassDynamicConfig"
+                  }
+                }
+              },
+              "then":{
+                "$ref":"http://watti.klaut.local/schemas/hass_dynamic_config_service_schema.yml"
+              },
+              "else":{
+                "errorMessage":"Unsupported service type."
+              }
             }
           }
         }
@@ -152,6 +164,10 @@
         "type":{
           "type":"string",
           "const":"Janitza"
+        },
+        "kind":{
+          "type":"string",
+          "const":"Meter"
         },
         "name":{
           "type":"string"
@@ -188,6 +204,10 @@
           "type":"string",
           "const":"HassFeeder"
         },
+        "kind":{
+          "type":"string",
+          "const":"Service"
+        },
         "mqtt_connection_name":{
           "type":"string",
           "description":"Name of an existing MQTT connection from mqtt_connections array."
@@ -209,6 +229,10 @@
         "type":{
           "type":"string",
           "const":"Victron"
+        },
+        "kind":{
+          "type":"string",
+          "const":"Meter"
         },
         "name":{
           "type":"string"
@@ -240,6 +264,10 @@
           "type":"string",
           "const":"VictronGridFeeder"
         },
+        "kind":{
+          "type":"string",
+          "const":"Service"
+        },
         "mqtt_connection_name":{
           "type":"string",
           "description":"Which MQTT connection to use"
@@ -270,6 +298,10 @@
           "type":"string",
           "const":"ChargeController"
         },
+        "kind":{
+          "type":"string",
+          "const":"Service"
+        },
         "grid_meter_name":{
           "type":"string",
           "description":"Name of the grid meter (e.g. Janitza or Victron) used by the charge controller to measure entire usage."
@@ -286,7 +318,17 @@
           "type":"number",
           "description":"Defines the target power level (in W) at the main grid connection. The controller attempts to regulate actual power flow towards this value.",
           "default":0,
-          "x_dynamic_config":true
+          "x_dynamic_config":true,
+          "x_hass_dynamic_config":{
+            "entity":"number",
+            "mode":"box",
+            "device_class":"power",
+            "exp_after":300,
+            "step":100,
+            "min":-10000,
+            "max":10000,
+            "unit_of_meas":"W"
+          }
         },
         "charge_limits":{
           "type":"object",
@@ -315,6 +357,35 @@
         "battery_meter_name",
         "battery_controller_name"
       ],
+      "additionalProperties":false
+    },
+    "http://watti.klaut.local/schemas/hass_dynamic_config_service_schema.yml":{
+      "$schema":"http://json-schema.org/draft-07/schema#",
+      "$id":"http://watti.klaut.local/schemas/hass_dynamic_config_service_schema.yml",
+      "title":"Hass Dynamic Config",
+      "type":"object",
+      "required":[
+        "mqtt_connection_name"
+      ],
+      "properties":{
+        "type":{
+          "type":"string",
+          "const":"HassDynamicConfig"
+        },
+        "kind":{
+          "type":"string",
+          "const":"Service"
+        },
+        "mqtt_connection_name":{
+          "type":"string",
+          "description":"Name of an existing MQTT connection from mqtt_connections array."
+        },
+        "persistent":{
+          "type":"boolean",
+          "description":"If true, dynmic configuration will be kept in mqtt and will survive watti_watchman restarts.",
+          "default":false
+        }
+      },
       "additionalProperties":false
     }
   }
