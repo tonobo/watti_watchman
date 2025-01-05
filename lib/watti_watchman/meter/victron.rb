@@ -59,9 +59,9 @@ module WattiWatchman
         %w(ac_out_voltage;phase=l2             V   measurement  voltage          Ac/Out/L2/V),
         %w(ac_out_voltage;phase=l3             V   measurement  voltage          Ac/Out/L3/V),
 
-        %w(ac_out_voltage_frequency;phase=l1   %   measurement  frequency        Ac/Out/L1/F),
-        %w(ac_out_voltage_frequency;phase=l2   %   measurement  frequency        Ac/Out/L2/F),
-        %w(ac_out_voltage_frequency;phase=l3   %   measurement  frequency        Ac/Out/L3/F),
+        %w(ac_out_voltage_frequency;phase=l1   Hz  measurement  frequency        Ac/Out/L1/F),
+        %w(ac_out_voltage_frequency;phase=l2   Hz  measurement  frequency        Ac/Out/L2/F),
+        %w(ac_out_voltage_frequency;phase=l3   Hz  measurement  frequency        Ac/Out/L3/F),
 
         %w(dc_power                      W   measurement  power            Dc/0/Power),
         %w(dc_current                    A   measurement  current          Dc/0/Current),
