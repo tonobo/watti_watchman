@@ -31,4 +31,11 @@ items:
       then:
         $ref: http://watti.klaut.local/schemas/charge_controller_service_schema.yml
       else:
-        errorMessage: Unsupported service type.
+        if:
+          properties:
+            type:
+              const: HassDynamicConfig
+        then:
+          $ref: http://watti.klaut.local/schemas/hass_dynamic_config_service_schema.yml
+        else:
+          errorMessage: Unsupported service type.

@@ -1,3 +1,5 @@
+require 'digest'
+
 module WattiWatchman
   module Service
     class HassFeeder

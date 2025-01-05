@@ -7,9 +7,16 @@ module WattiWatchman
   class Config < Struct.new(:config_data, :schemer)
     require_relative "config/hooks"
 
+    class << self
+      def dynamic_configs
+        @dynamic_configs ||= {}
+      end
+    end
+
     class ConfigError < WattiWatchman::Error; end
 
     SCHEMA_BASE_PATH   = File.expand_path("../../../schemas", __FILE__)
+    SUPPORTED_DYNAMIC_KIND = %w[Meter Service]
 
     extend WattiWatchman::Logger
 
@@ -34,12 +41,28 @@ module WattiWatchman
 
       config = JSONSchemer::Configuration.new(
         insert_property_defaults: true,
-        before_property_validation: proc do |data, property, property_schema, _parent| 
+        before_property_validation: proc do |data, property, property_schema, parent| 
           if property_schema.is_a?(Hash) && property_schema["x_dynamic_config"]
-            # TODO: Trigger hooks for dynamic hass inputs
+            kind = parent.dig("properties", "kind", "const")
+            unless SUPPORTED_DYNAMIC_KIND.include?(kind)
+              raise ConfigError, "Schema validation failed: kind must be one of #{SUPPORTED_DYNAMIC_KIND}"
+            end
+
+            type = parent.dig("properties", "type", "const")
+            if type.nil? || kind.nil?
+              raise ConfigError, "Schema validation failed: prop #{property.inspect} has" \
+                "dynamic configration enabled, but kind and type must be specified at parent"
+            end
+
+            type = "#{kind}/#{type}"
+            value = { property: property, schema: property_schema, parent: parent, data: data}
+
+            self.dynamic_configs[type] ||= {}
+            self.dynamic_configs[type] = { property => value} 
           end
         end
       )
+
       schemer = JSONSchemer.schema(
         main_schema_data,
         ref_resolver: definitions.to_proc,

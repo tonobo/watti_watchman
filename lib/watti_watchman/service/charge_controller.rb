@@ -113,8 +113,11 @@ module WattiWatchman
         min_threshold = discharge_limits.last * -1
         max_threshold = charge_limits.last
 
-        diff = (grid_meter.total_power * -1) + battery_meter.total_power + 
+        configured_setpoint = WattiWatchman::Config.dynamic_configs
+          .dig("Service/ChargeController", "target_setpoint", :active_value) ||
           options.fetch(:target_setpoint)
+
+        diff = (grid_meter.total_power * -1) + battery_meter.total_power + configured_setpoint 
 
         return diff if (min_threshold..max_threshold).include?(diff)
         return min_threshold if diff < min_threshold

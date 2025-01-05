@@ -6,6 +6,9 @@ properties:
   type:
     type: string
     const: VictronGridFeeder
+  kind:
+    type: string
+    const: Service
   mqtt_connection_name:
     type: string
     description: Which MQTT connection to use
