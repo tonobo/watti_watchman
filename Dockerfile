@@ -4,4 +4,4 @@ RUN apk add --no-cache git libcurl ruby-dev build-base libffi-dev && mkdir -p /a
 COPY . /app
 WORKDIR /app
 RUN bundle install
-CMD bundle exec puma -w 1 -v -e production -b tcp://0.0.0.0:9292
+CMD bundle exec puma -w 1 -e production -b tcp://0.0.0.0:9292
