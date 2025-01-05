@@ -137,8 +137,11 @@ module WattiWatchman
         Meter.callbacks.each do |name, block|
           block.call(metric_name, self)
         rescue StandardError => err
-          WattiWatchman.logger.warn "failed to run callback #{name.inspect}: #{err}"\
-            "\n#{err.backtrace.join("\n")}"
+          message = "failed to run callback #{name.inspect}: #{err.class.name} #{err}"
+          if ENV["DEBUG"]
+            message += "\n#{err.backtrace.join("\n")}"
+          end
+          WattiWatchman.logger.warn message
         end
       end
 
