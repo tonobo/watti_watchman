@@ -1,0 +1,26 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: http://watti.klaut.local/schemas/janitza_meter_schema.yml
+title: Janitza Meter
+type: object
+properties:
+  type:
+    type: string
+    const: Janitza
+  kind:
+    type: string
+    const: Meter
+  name:
+    type: string
+  host:
+    type: string
+  port:
+    type: integer
+  unit:
+    type: integer
+required:
+  - type
+  - name
+  - host
+  - port
+  - unit
+additionalProperties: false

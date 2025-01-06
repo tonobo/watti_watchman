@@ -14,6 +14,16 @@ module WattiWatchman
         @callbacks ||= Concurrent::Hash.new
       end
 
+      def connections
+        @connection ||= Concurrent::Hash.new
+      end
+
+      # Lookup function is used to get access to meter instances
+      def lookup(name)
+        connections[name]
+      end
+
+      # Register is use for callback registry
       def register(name, callback=nil, &block)
         return callbacks[name] = callback if callback
         return callbacks[name] = block if block_given?
@@ -127,8 +137,11 @@ module WattiWatchman
         Meter.callbacks.each do |name, block|
           block.call(metric_name, self)
         rescue StandardError => err
-          WattiWatchman.logger.warn "failed to run callback #{name.inspect}: #{err}"\
-            "\n#{err.backtrace.join("\n")}"
+          message = "failed to run callback #{name.inspect}: #{err.class.name} #{err}"
+          if ENV["DEBUG"]
+            message += "\n#{err.backtrace.join("\n")}"
+          end
+          WattiWatchman.logger.warn message
         end
       end
 

@@ -3,6 +3,18 @@ module WattiWatchman
     class Janitza
       include MeterClassifier
       include WattiWatchman::Logger
+      extend WattiWatchman::Config::Hooks
+
+      meter_config "Janitza" do |config, item|
+        meter = WattiWatchman::Meter::Janitza.new(
+          name: item["name"],
+          host: item["host"],
+          port: item["port"],
+          unit: item["unit"]
+        )
+        meter.spawn
+        WattiWatchman::Meter.connections[item['name']] = meter
+      end
       
       # Register order is mandatory as it's being used to efficently fetch all metrics once via modbus
       Registers = [

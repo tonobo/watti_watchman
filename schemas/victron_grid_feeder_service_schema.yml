@@ -1,0 +1,25 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: http://watti.klaut.local/schemas/victron_grid_feeder_service_schema.yml
+title: Victron Grid Feeder Service
+type: object
+properties:
+  type:
+    type: string
+    const: VictronGridFeeder
+  kind:
+    type: string
+    const: Service
+  mqtt_connection_name:
+    type: string
+    description: Which MQTT connection to use
+  grid_meter_name:
+    type: string
+    description: Which meter is used as grid meter
+  write_prefix:
+    type: string
+    description: Prefix to write data to (e.g. 'N/...'). Autoconfig will with Victron Grid Provider Service if not provided
+required:
+  - type
+  - mqtt_connection_name
+  - grid_meter_name
+additionalProperties: false
