@@ -330,6 +330,26 @@
             "unit_of_meas":"W"
           }
         },
+        "mode":{
+          "type":"string",
+          "description":"Defines the operating mode of the charge controller (both, charge, discharge).",
+          "default":"both",
+          "enum":[
+            "both",
+            "charge",
+            "discharge"
+          ],
+          "x_dynamic_config":true,
+          "x_hass_dynamic_config":{
+            "entity":"select",
+            "options":[
+              "both",
+              "charge",
+              "discharge"
+            ],
+            "mode":"dropdown"
+          }
+        },
         "charge_limits":{
           "type":"object",
           "patternProperties":{

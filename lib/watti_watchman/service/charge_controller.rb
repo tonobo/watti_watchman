@@ -10,7 +10,9 @@ module WattiWatchman
 
         cc_options = {
           charge_limits:    (item["charge_limits"]    || {}).transform_keys!(&:to_i),
-          discharge_limits: (item["discharge_limits"] || {}).transform_keys!(&:to_i)
+          discharge_limits: (item["discharge_limits"] || {}).transform_keys!(&:to_i),
+          mode: item["mode"],
+          target_setpoint: item["target_setpoint"]
         }
 
         charge_controller = WattiWatchman::Service::ChargeController.new(
@@ -113,11 +115,22 @@ module WattiWatchman
         min_threshold = discharge_limits.last * -1
         max_threshold = charge_limits.last
 
+
         configured_setpoint = WattiWatchman::Config.dynamic_configs
           .dig("Service/ChargeController", "target_setpoint", :active_value) ||
           options.fetch(:target_setpoint)
 
         diff = (grid_meter.total_power * -1) + battery_meter.total_power + configured_setpoint 
+
+        charge_mode = WattiWatchman::Config.dynamic_configs
+          .dig("Service/ChargeController", "mode", :active_value) ||
+          options[:mode]
+        case charge_mode
+        when "discharge"
+          return 0 if diff.positive?
+        when "charge"
+          return 0 if diff.negative?
+        end
 
         return diff if (min_threshold..max_threshold).include?(diff)
         return min_threshold if diff < min_threshold

@@ -6,7 +6,7 @@ module WattiWatchman
       include WattiWatchman::Logger
       extend WattiWatchman::Config::Hooks
 
-      SUPPORTED_ENTITIES = %w[number]
+      SUPPORTED_ENTITIES = %w[number select]
 
       service_config "HassDynamicConfig" do |config, item|
         conn = config.lookup_mqtt_connection(item["mqtt_connection_name"])
