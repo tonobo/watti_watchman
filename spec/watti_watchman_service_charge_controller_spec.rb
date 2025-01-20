@@ -161,56 +161,70 @@ RSpec.describe WattiWatchman::Service::ChargeController do
     end
 
     context "when discharge is expected" do
-      it "feeds 1000W to grid as it is exact difference" do
-        total_setpoint!(grid: 1000, battery: 0, soc: 30..100)
-        expect(charge_controller.setpoint).to eq(-1000)
-      end
+      [ {mode: "discharge"}, {mode: "both"}, {} ].each do |options|
+        context "options: #{options}" do
+          let(:options) { options }
+          it "feeds 1000W to grid as it is exact difference" do
+            total_setpoint!(grid: 1000, battery: 0, soc: 30..100)
+            expect(charge_controller.setpoint).to eq(-1000)
+          end
 
-      it "feeds 2000W to grid as it's the defined threshold" do
-        total_setpoint!(grid: 3500, battery: 0, soc: 30..100)
-        expect(charge_controller.setpoint).to eq(-2000)
-      end
+          it "feeds 2000W to grid as it's the defined threshold" do
+            total_setpoint!(grid: 3500, battery: 0, soc: 30..100)
+            expect(charge_controller.setpoint).to eq(-2000)
+          end
 
-      it "feeds 2000W to grid as it's the defined threshold and starts with battery offset" do
-        total_setpoint!(grid: 4500, battery: 1000, soc: 30..100)
-        expect(charge_controller.setpoint).to eq(-2000)
-      end
+          it "feeds 2000W to grid as it's the defined threshold and starts with battery offset" do
+            total_setpoint!(grid: 4500, battery: 1000, soc: 30..100)
+            expect(charge_controller.setpoint).to eq(-2000)
+          end
 
-      it "feeds 1000W to grid as the soc threshold hits <10%" do
-        total_setpoint!(grid: 3500, battery: 0, soc: 5...10.0)
-        expect(charge_controller.setpoint).to eq(-1000)
-      end
+          it "feeds 1000W to grid as the soc threshold hits <10%" do
+            total_setpoint!(grid: 3500, battery: 0, soc: 5...10.0)
+            expect(charge_controller.setpoint).to eq(-1000)
+          end
 
-      it "feeds 0W to grid as the soc threshold hits <5%" do
-        total_setpoint!(grid: 3500, battery: 0, soc: 0...5.0)
-        expect(charge_controller.setpoint).to eq(0)
+          it "feeds 0W to grid as the soc threshold hits <5%" do
+            total_setpoint!(grid: 3500, battery: 0, soc: 0...5.0)
+            expect(charge_controller.setpoint).to eq(0)
+          end
+        end
       end
     end
 
     context "when charge is expected" do
-      it "loads 1000W from grid as it is exact difference" do
-        total_setpoint!(grid: -1000, battery: 0, soc: 30...90)
-        expect(charge_controller.setpoint).to eq(1000)
-      end
+      [ 
+        {mode: "charge"}, 
+        {mode: "both"}, 
+        {}, 
+      ].each do |options|
+        context "options: #{options}" do
+          let(:options) { options }
+          it "loads 1000W from grid as it is exact difference" do
+            total_setpoint!(grid: -1000, battery: 0, soc: 30...90)
+            expect(charge_controller.setpoint).to eq(1000)
+          end
 
-      it "loads 3000W from grid as it's the defined threshold" do
-        total_setpoint!(grid: -3500, battery: 0, soc: 30...90)
-        expect(charge_controller.setpoint).to eq(3000)
-      end
+          it "loads 3000W from grid as it's the defined threshold" do
+            total_setpoint!(grid: -3500, battery: 0, soc: 30...90)
+            expect(charge_controller.setpoint).to eq(3000)
+          end
 
-      it "loads 3000W from grid as it's the defined threshold and starts with battery offset" do
-        total_setpoint!(grid: -4500, battery: 1000, soc: 30...90)
-        expect(charge_controller.setpoint).to eq(3000)
-      end
+          it "loads 3000W from grid as it's the defined threshold and starts with battery offset" do
+            total_setpoint!(grid: -4500, battery: 1000, soc: 30...90)
+            expect(charge_controller.setpoint).to eq(3000)
+          end
 
-      it "loads 1000W from grid as the soc threshold hits >90%" do
-        total_setpoint!(grid: -3500, battery: 0, soc: 90...97.0)
-        expect(charge_controller.setpoint).to eq(1000)
-      end
+          it "loads 1000W from grid as the soc threshold hits >90%" do
+            total_setpoint!(grid: -3500, battery: 0, soc: 90...97.0)
+            expect(charge_controller.setpoint).to eq(1000)
+          end
 
-      it "loads 0W from grid as the soc threshold hits >97%" do
-        total_setpoint!(grid: -3500, battery: 0, soc: 97..100.0)
-        expect(charge_controller.setpoint).to eq(500)
+          it "loads 0W from grid as the soc threshold hits >97%" do
+            total_setpoint!(grid: -3500, battery: 0, soc: 97..100.0)
+            expect(charge_controller.setpoint).to eq(500)
+          end
+        end
       end
     end
   end
