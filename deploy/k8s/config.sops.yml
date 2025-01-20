@@ -1,0 +1,46 @@
+mqtt_connections:
+  - name: mqtt_k8s
+    host: mqtt.apps.svc.cluster.local
+    port: 1883
+  - name: mqtt_venus
+    host: 10.100.6.134
+    port: 1883
+meters:
+  - type: Janitza
+    name: hak
+    host: 10.100.6.27
+    port: 502
+    unit: 2
+  - type: Janitza
+    name: battery_janitza
+    host: 10.100.6.25
+    port: 502
+    unit: 1
+  - type: Victron
+    name: battery_victron
+    mqtt_connection_name: mqtt_venus
+    id: <ENV>
+services:
+  - type: HassFeeder
+    mqtt_connection_name: mqtt_k8s
+    update_interval: 5
+  - type: HassDynamicConfig
+    mqtt_connection_name: mqtt_k8s
+    persistent: true
+  - type: VictronGridFeeder
+    mqtt_connection_name: mqtt_venus
+    grid_meter_name: hak
+  - type: ChargeController
+    grid_meter_name: hak
+    battery_meter_name: battery_janitza
+    battery_controller_name: battery_victron
+    target_setpoint: 0
+    charge_limits:
+      "0": 9000
+      "90": 2000
+      "97": 1000
+      "99": 500
+    discharge_limits:
+      "100": 6000
+      "10": 1000
+      "5": 0
