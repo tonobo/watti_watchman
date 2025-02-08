@@ -4,6 +4,7 @@ PATH
     watti_watchman (0.1.0)
       async
       concurrent-ruby
+      ffi
       json_schemer
       mqtt
       oj
@@ -28,6 +29,8 @@ GEM
     docile (1.4.1)
     faker (3.5.1)
       i18n (>= 1.8.11, < 2)
+    ffi (1.17.1)
+    ffi (1.17.1-x86_64-linux-gnu)
     fiber-annotation (0.2.0)
     fiber-local (1.1.0)
       fiber-storage
