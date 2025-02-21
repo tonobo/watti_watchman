@@ -24,7 +24,7 @@ module WattiWatchman
 
         if message
           message += " (suppressed #{old_counter - 1} logs)" if old_counter > 1 
-        elsif progname && block.nil?
+        elsif progname.is_a?(String) && block.nil?
           progname += " (suppressed #{old_counter - 1} logs)" if old_counter > 1 
         end
 

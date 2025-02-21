@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rmodbus"
   spec.add_dependency "concurrent-ruby"
   spec.add_dependency "oj"
+  spec.add_dependency "ox"
   spec.add_dependency "async"
   spec.add_dependency "json_schemer"
   spec.add_dependency "ffi"
