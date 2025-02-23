@@ -14,6 +14,7 @@ module WattiWatchman
         end
 
         def m(name, value=0)
+          name = name.gsub(/[^A-Za-z0-9]/, "_").downcase 
           Metric.new(
             Definition.new("seplos_telesignal_"+name, "-", "measurement", "-", "-"),
             value

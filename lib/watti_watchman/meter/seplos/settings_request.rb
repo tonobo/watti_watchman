@@ -72,7 +72,7 @@ module WattiWatchman
             spec[:haklass] = "-"
             spec[:unit] = "-"
           end
-          spec[:name] = spec[:name].tr(" ", "_").downcase
+          spec[:name] = spec[:name].gsub(/[^A-Za-z0-9]/, "_").downcase
           spec[:calc] ||= ->(val) { val * spec[:scale] }
           spec
         end 
@@ -88,7 +88,7 @@ module WattiWatchman
               ].flatten
             end.map do
               { 
-                name: _1[0].tr(" ", "_").downcase, 
+                name: _1[0].gsub(/[^A-Za-z0-9]/, "_").downcase, 
                 byte_index: _1[1].to_i(16), 
                 bit_index: _1[2].to_i
               }
