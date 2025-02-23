@@ -24,4 +24,11 @@ items:
     then:
       $ref: http://watti.klaut.local/schemas/victron_meter_schema.yml
     else:
-      errorMessage: Unsupported meter type.
+      if:
+        properties:
+          type:
+            const: Seploy
+      then:
+        $ref: http://watti.klaut.local/schemas/seplos_meter_schema.yml
+      else:
+        errorMessage: Unsupported meter type.

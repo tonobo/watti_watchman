@@ -38,4 +38,11 @@ items:
         then:
           $ref: http://watti.klaut.local/schemas/hass_dynamic_config_service_schema.yml
         else:
-          errorMessage: Unsupported service type.
+          if:
+            properties:
+              type:
+                const: Pyloncan
+          then:
+            $ref: http://watti.klaut.local/schemas/pyloncan_service_schema.yml
+          else:
+            errorMessage: Unsupported service type.

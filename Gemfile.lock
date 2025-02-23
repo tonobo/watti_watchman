@@ -4,9 +4,11 @@ PATH
     watti_watchman (0.1.0)
       async
       concurrent-ruby
+      ffi
       json_schemer
       mqtt
       oj
+      ox
       rmodbus
 
 GEM
@@ -28,6 +30,8 @@ GEM
     docile (1.4.1)
     faker (3.5.1)
       i18n (>= 1.8.11, < 2)
+    ffi (1.17.1)
+    ffi (1.17.1-x86_64-linux-gnu)
     fiber-annotation (0.2.0)
     fiber-local (1.1.0)
       fiber-storage
@@ -48,6 +52,8 @@ GEM
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
     ostruct (0.6.1)
+    ox (2.14.22)
+      bigdecimal (>= 3.0)
     puma (6.5.0)
       nio4r (~> 2.0)
     rack (3.1.8)

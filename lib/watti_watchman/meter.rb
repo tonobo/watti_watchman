@@ -163,4 +163,5 @@ require_relative "meter/meter_classifier"
 require_relative "meter/battery_controller"
 require_relative "meter/janitza"
 require_relative "meter/victron"
+require_relative "meter/seplos"
 
