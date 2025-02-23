@@ -42,7 +42,7 @@ module WattiWatchman
             cell_hex = response[offset, 4]
             value = cell_hex.to_i(16).to_f / 1000.0
             m("cell_voltage", value)
-              .tap{ _1.label(:cell, i.to_s) }
+              .tap{ _1.label(:cell, (i+1).to_s) }
               .update!
             offset += 4
           end
