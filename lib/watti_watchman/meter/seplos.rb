@@ -67,7 +67,7 @@ module WattiWatchman
         end
 
         unless connected? 
-          logger.warn "skip enqueing of request '#{request}', not yet connected"
+          logger.warn "skip enqueing of request '#{klass}', not yet connected"
           return
         end
 
