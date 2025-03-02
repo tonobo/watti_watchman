@@ -61,7 +61,7 @@ module WattiWatchman
           end
 
           fields_spec = [
-            ["charge_rate",           4, 100.0],
+            ["charge_rate",           4, 100.0, true],
             ["total_battery_voltage", 4, 100.0],
             ["residual_capacity",     4, 100.0],
             [nil,                     2],
@@ -73,7 +73,7 @@ module WattiWatchman
             ["port_voltage",          4, 100.0],
           ]
           attributes = {}
-          fields_spec.each do |key, length, factor|
+          fields_spec.each do |key, length, factor, signed|
             next(offset += length) if key.nil? 
 
             hex_val = response[offset, length]
@@ -81,9 +81,11 @@ module WattiWatchman
 
             bytes = length / 2
 
-            threshold = 1 << (bytes * 8 - 1)
-            max_val   = 1 << (bytes * 8)
-            value = value >= threshold ? value - max_val : value
+            if signed
+              threshold = 1 << (bytes * 8 - 1)
+              max_val   = 1 << (bytes * 8)
+              value = value >= threshold ? value - max_val : value
+            end
 
             value = value.to_f / factor if factor != 1.0
             m(key, value).update!
