@@ -45,10 +45,10 @@ module WattiWatchman
             when /bitmask\|[0-7]/
               bit = type.to_s[/bitmask\|(\d)/, 1].to_i
               (data[area.first] & (1 << bit)) != 0
-            when 'int16'
+            when 'uint16'
               raise(ArgumentError, "area #{area} must match 2 bytes") unless area.size == 2
               (data[area.first] | (data[area.last] << 8)) / scale
-            when 'uint16'
+            when 'int16'
               raise(ArgumentError, "area #{area} must match 2 bytes") unless area.size == 2
               (data[area.first] | (data[area.last] << 8)).yield_self do
                 _1 >= 0x8000 ? (_1 - 0x10000) / scale : _1 / scale
