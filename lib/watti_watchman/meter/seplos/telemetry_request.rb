@@ -37,13 +37,12 @@ module WattiWatchman
           offset = 16
           cell_count_hex = response[offset, 2]; offset += 2
           cell_count = cell_count_hex.to_i(16)
+          metrics = []
 
           cell_count.times do |i|
             cell_hex = response[offset, 4]
             value = cell_hex.to_i(16).to_f / 1000.0
-            m("cell_voltage", value)
-              .tap{ _1.label(:cell, (i+1).to_s) }
-              .update!
+            metrics << m("cell_voltage", value).tap{ _1.label(:cell, (i+1).to_s) }
             offset += 4
           end
 
@@ -54,9 +53,7 @@ module WattiWatchman
             raw = temp_hex.to_i(16)
             # temperatures are measured in K
             value = ((raw - 2731) / 10.0)
-            m("temperature_celsius", value)
-              .tap{ _1.label(:sensor, i.to_s) }
-              .update!
+            metrics << m("temperature_celsius", value).tap{ _1.label(:sensor, i.to_s) }
             offset += 4
           end
 
@@ -88,9 +85,11 @@ module WattiWatchman
             end
 
             value = value.to_f / factor if factor != 1.0
-            m(key, value).update!
+            metrics << m(key, value)
             offset += length
           end
+
+          metrics.each(&:update!)
         end
       end
     end
