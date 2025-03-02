@@ -78,6 +78,13 @@ module WattiWatchman
 
             hex_val = response[offset, length]
             value = hex_val.to_i(16)
+
+            bytes = length / 2
+
+            threshold = 1 << (bytes * 8 - 1)
+            max_val   = 1 << (bytes * 8)
+            value = value >= threshold ? value - max_val : value
+
             value = value.to_f / factor if factor != 1.0
             m(key, value).update!
             offset += length
