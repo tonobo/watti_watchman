@@ -5,14 +5,11 @@ module WattiWatchman
         include WattiWatchman::Logger
 
         DEFAULT = {
-          version: 0x20,
-          address: 0,
-          device_code: 0x46,
           data: "00",
         }
 
         attr_reader :options
-        attr_accessor :timeout, :enqueued_at
+        attr_accessor :timeout, :enqueued_at, :addr
 
         def initialize(function:, **options)
           @options = DEFAULT.merge(options)
@@ -32,8 +29,7 @@ module WattiWatchman
         end
 
         def data
-          base = header + lchksum(options[:data]) + options[:data]
-          base + chksum(base)
+          encode_cmd(addr, options[:function])
         end
 
         def process(request)
@@ -42,26 +38,52 @@ module WattiWatchman
 
         private
 
-        def header
-          "%02X%02X%02X%02X" % [
-            options[:version],
-            options[:address],
-            options[:device_code],
-            options[:function],
-          ]
+        def calculate_frame_checksum(frame)
+          checksum = 0
+          frame.each_byte { |b| checksum += b }
+          checksum %= 0xFFFF
+          checksum ^= 0xFFFF
+          checksum += 1
+          checksum
         end
 
-        def chksum(data)
-          sum = data.bytes.reduce(0) { |sum, byte| sum + byte }
-          sum = (~sum) + 1
-          '%X' % ((sum % 0xFFFF) + 1)
+        def self.inverse_info_length(hex_str)
+          num = hex_str.to_i(16)
+          return 0 if num == 0
+
+          lenid  = num & 0xFFF
+          chksum = (num >> 12) & 0xF
+
+          expected = ((((lenid & 0xF) +
+                        ((lenid >> 4) & 0xF) +
+                        ((lenid >> 8) & 0xF)) % 16) ^ 0xF) + 1
+
+          unless expected == chksum
+            raise "invalid checksum: expected=#{expected}, got=#{chksum}"
+          end
+
+          lenid
         end
 
-        def lchksum(data)
-          len = data.size
-          lsum = (len & 0xf) + ((len >> 4) & 0xf) + ((len >> 8) & 0xf)
-          lsum = ~(lsum % 16) + 1
-          '%X' % (((lsum << 12) + len) & 0xFFFF)
+        def info_length(info)
+          lenid = info.bytesize
+          return 0 if lenid == 0
+
+          lchksum = (lenid & 0xF) + ((lenid >> 4) & 0xF) + ((lenid >> 8) & 0xF)
+          lchksum %= 16
+          lchksum ^= 0xF
+          lchksum += 1
+          (lchksum << 12) + lenid
+        end
+
+        def encode_cmd(address, cid2 = nil, info = "01".b)
+          cid1 = 0x46
+          info_length = info_length(info)
+          frame = format("%02X%02X%02X%02X%04X", 0x20, address, cid1, cid2 || 0x00, info_length).b
+          frame += info
+          checksum = calculate_frame_checksum(frame)
+          encoded = frame + format("%04X", checksum).b
+          encoded
         end
       end
     end
