@@ -32,9 +32,14 @@ module WattiWatchman
       end
 
       def spawn
-        Config.dynamic_configs.each do |service_name, property_hash|
-          property_hash.each do |property_name, config|
-            submit_hass_config(service_name, property_name, config)
+        Thread.new do
+          loop do
+            Config.dynamic_configs.each do |service_name, property_hash|
+              property_hash.each do |property_name, config|
+                submit_hass_config(service_name, property_name, config)
+              end
+            end
+            sleep 60
           end
         end
         Thread.new do 
