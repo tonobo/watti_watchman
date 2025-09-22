@@ -101,7 +101,7 @@ RSpec.describe WattiWatchman::Service::HassFeeder do
         )
 
         feeder.call(metric_name, metric)
-        expect(mock_mqtt_client).to have_received(:publish).exactly(3).times
+        expect(mock_mqtt_client).to have_received(:publish).exactly(4).times
       end
     end
   end

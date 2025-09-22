@@ -3,6 +3,9 @@ require 'digest'
 module WattiWatchman
   module Service
     class HassFeeder
+
+      CONFIG_REFRESH_INTERVAL = 60
+
       include WattiWatchman::Logger
       extend WattiWatchman::Config::Hooks
 
@@ -43,14 +46,16 @@ module WattiWatchman
         metric_instance_name = metric._labels[:name]
         routing_key = "#{routing_key}___#{metric_instance_name}"
 
-        unless @feed_cache[metric_name]
+        @feed_cache[metric_name] ||= {last_feed_cache_updated_at: 0}
+
+        if WattiWatchman.now - @feed_cache[metric_name][:last_feed_cache_updated_at].to_i > CONFIG_REFRESH_INTERVAL
           submit_hass_config(metric_name, metric, routing_key)
-          @feed_cache[metric_name] = {}
+          @feed_cache[metric_name] = { last_feed_cache_updated_at: WattiWatchman.now }
         end
 
         if WattiWatchman.now - @feed_cache[metric_name][:last_updated_at].to_i > @update_interval
           mqtt.publish(stat_t(routing_key), metric.value.to_f.round(1))
-          @feed_cache[metric_name] = { last_updated_at: WattiWatchman.now }
+          @feed_cache[metric_name][:last_updated_at] = WattiWatchman.now
         end
       end
 
